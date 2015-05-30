@@ -1,0 +1,86 @@
+
+ Problem no.    1, iFail =  0
+
+ System pressure = 1.00000 atm
+ Volume =   1.000 m**3
+ T      = 298.150 K
+ RH     = 0.19860 [pH2O =  0.62071E-02 atm]
+ (The relative humidity above was calculated from the moles
+  of water present in the gas phase.)
+
+
+ ********************
+ **  AQUEOUS PHASE **
+ ********************
+ Species      Moles         Grams        Molality     Mole Frac.   Act. Coeff.   Act. Eqn.   Model
+ H(aq)        0.34531E-11   0.3480E-11   0.5348E-01   0.3158E-03   0.2538E+01    PSC         PSC (base)       
+ NH4(aq)      0.83052E-10   0.1498E-08   0.1286E+01   0.7594E-02   0.1068E+01    PSC         PSC (base)       
+ DMA+(aq)     0.83852E-09   0.3865E-07   0.1299E+02   0.7668E-01   0.1068E+01    PSC         PSC (added)      
+ HSO4(aq)     0.93578E-12   0.9083E-10   0.1449E-01   0.8557E-04   0.2280E+01    PSC         PSC (base)       
+ SO4(aq)      0.15752E-10   0.1513E-08   0.2440E+00   0.1440E-02   0.3197E-01    PSC         PSC (base)       
+ OH(aq)       0.17577E-23   0.2989E-22   0.2723E-13   0.1607E-15   0.5013E+01    PSC         PSC (base)       
+ Malo-(aq)    0.31915E-11   0.6006E-09   0.4943E-01   0.2918E-03   0.2420E+01    PSC         PSC (added)      
+ Malo2-(aq)   0.44470E-09   0.8324E-07   0.6888E+01   0.4066E-01   0.3247E-01    PSC         PSC (added)      
+ H2O(aq)      0.35837E-08   0.6456E-07   0.5551E+02   0.3277E+00   0.6060E+00                CSB              
+ NH3(aq)      0.37193E-18   0.6334E-17   0.5761E-08   0.3401E-10   0.3052E+01    PSC         PSC (ext.)       
+ Maloni(aq)   0.59625E-08   0.1128E-05   0.9235E+02   0.5452E+00   0.2403E+01    UNIFAC      UNIFAC           
+ DMA(aq)      0.79963E-19   0.3605E-17   0.1239E-08   0.7312E-11   0.4687E+01    UNIFAC      UNIFAC           
+
+ (1) The density of the aqueous phase is 1.16969 g per cm^3, and its total volume
+ is  1.11424E-06 cm^3.
+ 
+ Apparent molar volumes of the following additional solute(s) (determined from
+ measured densities of aqueous solutions) were used in these calculations: (DMA+)2SO4.
+ 
+ The apparent molar volumes of one or more solutes containing mono- and di-valent
+ aminium cations are assumed to be fixed, with the values for the cations taken
+ from a simple correlation based upon available data.
+
+ (2) The surface tension of the aqueous phase is estimated to be 71.94 mN per m.
+
+ No surface tension model parameters are available for the component(s) listed
+ below, (followed by their mole percentage(s) in the mixture):
+ Maloni (5.96E+01), DMA (7.99E-10), H(Malo-) (1.51E-04), H2(Malo2-) (2.11E-02),
+ NH4(Malo-) (2.86E-03), (NH4)2(Malo2-) (3.98E-01), (DMA+)OH (1.59E-14), (DMA+)(Malo-)
+ (2.89E-02), etc.
+ 
+ Surface tension model parameters of the following  additional solute(s) (determined
+ from measured densities of aqueous solutions) were used in these calculations:
+ (DMA+)2SO4.
+
+ (3) The molal osmotic coefficient of the aqueous phase is   0.7879. (It is equal
+ to -ln(aH2O) / ((MW/1000) * SUM), where aH2O is the water activity, SUM is
+ the total molality of all solute species, and MW is the molar mass of water
+ in grams.)
+
+ There is no second liquid phase.
+
+
+ *************
+ **  GASES  **
+ *************
+  Moles         Pressure (atm)  Species
+  2.5530E-01     6.2071E-03     H2O(g)                
+  3.9022E-09     9.4876E-11     NH3(g)                
+  1.4223E-21     3.4580E-23     H2SO4(g)              
+  2.3176E-10     5.6349E-12     Maloni(g)             
+  2.4909E-09     6.0561E-11     DMA(g)                
+
+ - Calculated partial pressures (over liquid) -
+ Pressure (atm)   Species     Equiv. Moles
+  6.2071E-03      H2O(g)           -     
+  9.4876E-11      NH3(g)           -     
+  3.4580E-23      H2SO4(g)         -     
+  5.6349E-12      Maloni(g)        -     
+  6.0561E-11      DMA(g)           -     
+
+
+ **************
+ **  SOLIDS  **
+ **************
+ There are no pure solid phases.
+
+ There is no mixed solid phase.
+
+
+ ***************************************************************************

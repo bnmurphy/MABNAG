@@ -1,0 +1,402 @@
++                   ORGANIC COMPOUND PROPERTIES FILE                       +
++                                                                          +
++            (notes and data blocks last edited 28/10/2014)                +
++                                                                          +
++  The properties of each organic compound in the system are entered in    +
++  this file. We also specify whether they exist in the aqueous or a       +
++  second largely non-aqueous liquid phase, or can partition between the   +
++  two.                                                                    +
++                                                                          +
++  Where a second liquid phase may exist it is also necessary to indicate  +
++  how the inorganic ions partition between liquid phases, if at all.      +
++                                                                          +
++  Inorganic Behaviour:                                                    +
++  ===================                                                     +
++  Case 1: All ions are confined to the aqueous phase and are not able     +
++          to partition into any other liquid phases.                      +
++  Case 2: Ions are confined to the aqueous phase, with the exception      +
++          of H+ or OH- which are able to partition between liquid phases. +
++  Case 3: All ions are able to partition between both liquid phases.      +
++                                                                          +
++                                                                          +
++                                                                          +
++  Exclusion of water from the second (hydrophobic) liquid phase           +
++  =============================================================           +
++  Where a second liquid phase may exist we can also specify that the      +
++  amount of water in that phase be set to zero. This requires that the    +
++  activity coefficients of the organic compounds in the second liquid     +
++  phase be Raoult's law (ie, equal to unity) and/or calculated using      +
++  UNIFAC. Choices other than these will be trapped as errors.             +
++                                                                          +
++  The entry for item 1b below should be given as "Yes" or "No" (without   +
++  the quotation marks).                                                   +
++                                                                          +
++                                                                          +
++                                                                          +
++  Organic Behaviour:                                                      +
++  =================                                                       +
++  Case 1:  this organic HOrg and its dissociation products H+             +
++           and Org- (if any) are confined to the aqueous phase.           +
++  Case 2:  this organic HOrg and its dissociation products                +
++           H+ and Org- (if any) are confined to the other liquid          +
++           phase.                                                         +
++  Case 3:  this organic HOrg can be present in both liquid                +
++           phases, but the dissociation products H+ and                   +
++           Org- (if any) are confined to the aqueous phase.               +
++  Case 4:  this organic HOrg and its dissociation products H+             +
++           and Org- (if any) can be in both liquid phases.                +
++                                                                          +
++  If the organic molecule is not an acid then it will be                  +
++  non-dissociating and cases 1-4 will apply to the organic                +
++  molecule only. In the input block below the data fields                 +
++  relating to dissociation (items 5 and 6) can be left blank.             +
++                                                                          +
++                                                                          +
++  Amine dissociation constants. The cases we can consider are:            +
++                                                                          +
++  (1) Mono amine                                                          +
++  (2) Diamine                                                             +
++  We do not treat amino acids.                                            +
++                                                                          +
++                                                                          +
++  Activity coefficient expression                                         +
++  for each individual solute:                                             +
++  ===============================                                         +
++   1 - Raoult's law is assumed (leave item 8b blank).                     +
++   2 - The McGlashan equation (up to 15 parameters).                      +
++   3 - The Pitzer/Simonson/Clegg model (2 parameters).                    +
++   4 - UNIFAC                                                             +
++                                                                          +
++  Overall activity model treatment                                        +
++  for each solute:                                                        +
++  ================================                                        +
++   1 - Individual component within the model.                             +
++   2 - Zdanovskii-Stokes-Robinson (with other components).                +
++   4 - UNIFAC (with other components for which UNIFAC is                  +
++       the choice of individual actvity coefficient expression).          +
++                                                                          +
+----------------------------------------------------------------------------
+
++++++++++
+++ 1a  ++ Inorganic partitioning case number: 1
++++++++++
++++++++++
+++ 1b  ++ Total number of organic compounds:  2
++++++++++
++++++++++
+++ 2a  ++ Exclude water from the second (hydrophobic) liquid phase: Yes
++++++++++
++++++++++
+++ 2b  ++ Name of UNIFAC parameter set file:  unifac.mst
++++++++++
++++++++++
++++++++++ Now repeat the input block below (items 3 to 13, inclusive)
++++++++++ for the total number of organic compounds entered above.
++++++++++
+
+
+
++++++++++
+++START++
+++INPUT++
+++BLOCK++
++++++++++
+++ 3a  ++ -> Compound Name: Maloni
+++ 3b  ++ -> Molar Mass (g): 189.20D0 
+++     ++    
+++     ++    
+++     ++    
+++ 4   ++ -> Molar Volume (cm3 mol-1): 153.8D0
+++     ++    
+++     ++    
+++     ++
+++ 5   ++ -> Organic case number (defines partitioning behaviour): 1
+++     ++    
+++     ++    
+++     ++    
+++     ++    1st Dissociation Constant (mol kg-1),
+++ 6a  ++ ->   for the reaction A(aq) = H+(aq) + B-(aq): 2.3988D-5
+++ 6b  ++ -> Enthalpy change (kJ mol-1): 
+++ 6c  ++ -> Name of Anion B-(aq): Malo-
+++     ++    
+++     ++    2nd Dissociation Constant (mol2 kg-2),
+++ 7a  ++ ->   for the reaction A(aq) = 2H+(aq) + C--(aq): 1.9952D-6
+++ 7b  ++ -> Enthalpy change (kJ mol-1): 
+++ 7c  ++ -> Name of Anion C--(aq): Malo2-
+++     ++
+++     ++
+++     ++
+++     ++    Mono- and di-amines, 1st Dissociation Constant (mol kg-1),
+++ 8a  ++ ->   for the reaction +H3NR(aq) = H+(aq) + H2NR(aq): 
+++ 8b  ++ -> Enthalpy change (kJ mol-1): 
+++ 8c  ++ -> Name of amine cation +H3NR(aq): 
+++     ++    
+++     ++    Di-amines, 2nd Dissociation Constant (mol2 kg-2),
+++ 9a  ++ ->   for the reaction +H3RNH3+(aq) = 2H+(aq) + H2NRNH2(aq): 
+++ 9b  ++ -> Enthalpy change (kJ mol-1): 
+++ 9c  ++ -> Name of amine cation +H3NRNH3+(aq): 
+++     ++
+++     ++
+++     ++
+++     ++    Activity calculations for the solute in the aqueous phase
+++     ++    ---------------------------------------------------------
+++ 10a ++ -> Equation for this solute (1,2,3,4): 4
+++ 10b ++ -> Parameters or groups for the equation: 1*CH2 2*COOH 
+++     ++    *Choices: 1 - Raoult's law
+++     ++              2 - McGlashan eqn. (enter parameters)
+++     ++              3 - Pitzer Simonson Clegg eqn. (enter parameters)
+++     ++              4 - UNIFAC (enter structural groups)
+++     ++
+++ 10c ++ -> Overall activity model, if member of solute group (1,2,4): 4 
+++     ++    *Choices: 1 - Individual component (no group)
+++     ++              2 - Zdanovskii-Stokes-Robinson
+++     ++              4 - UNIFAC
+++     ++
+++     ++    Activity calculations for the solute in the second liquid phase
+++     ++    ---------------------------------------------------------------
+++ 10d ++ -> Equation for this solute (1,2,3,4): 4
+++ 10e ++ -> Parameters or groups for the equation: 
+++     ++    *Choices: 1 - Raoult's law
+++     ++              2 - McGlashan eqn. (enter parameters)
+++     ++              3 - Pitzer Simonson Clegg eqn. (enter parameters)
+++     ++              4 - UNIFAC (enter structural groups)
+++     ++
+++ 10f ++ -> Overall activity model, if member of solute group (1,2,4): 4
+++     ++    *Choices: 1 - Individual component (no group)
+++     ++              2 - Zdanovskii-Stokes-Robinson
+++     ++              4 - UNIFAC
+++     ++
+++     ++
+++     ++
+++     ++    Surface tension parameters for the undissociated
+++     ++    organic, to yield surface tension in mN m-1.
+++     ++    ------------------------------------------------
+++ 11a ++ -> a_ws: 
+++ 11b ++ -> b_ws:
+++ 11c ++ -> a_sw:
+++ 11d ++ -> b_sw:
+++ 11e ++ -> c1:
+++ 11f ++ -> c2:
+++     ++
+++     ++
+++     ++
+++     ++    Volatility
+++     ++    ----------
+++ 12a ++ -> Henry's law constant (KH, mol kg-1 atm-1): 
+++ 12b ++ -> Enthalpy change for KH (kJ mol-1):
+++ 12c ++ -> Heat capacity change (J mol-1 K-1):
+++     ++    
+++     ++                  ** OR **
+++     ++    
+++ 12d ++ -> Vapour pressure of the Pure Compound (p0, atm): 0.9869D-11
+++ 12e ++ -> Enthalpy change for p0 (kJ mol-1):     
+++ 12f ++ -> Heat capacity change (J mol-1 K-1): 
+++ 12g ++ -> Value of ln(fOrg) (see note below): 
+++ 12h ++ -> 1st differential of ln(fOrg) with respect to T:
+++ 12i ++ -> 2nd differential of ln(fOrg) with respect to T:
+++     ++    *Note: fOrg is the mole fraction activity
+++     ++     coefficient at infinite dilution in water,
+++     ++     for a reference state of the pure liquid 
+++     ++     organic compound.
+++     ++    *Leave 10g-10i blank if unknown (and 
+++     ++     values will be assumed to be zero).
+++     ++                                                
+++     ++
+++     ++
+++     ++    Solid
+++     ++    -----
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 13a ++ -> solution saturated with respect to the solid: 17.28   
+++ 13b ++ -> No. of water molecules of hydration: 
+++ 13c ++ -> Enthalpy change for Ks (kJ mol-1):  
+++ 13d ++ -> Heat capacity change (J mol-1 K-1): 
+++ 13e ++ -> Molar volume of the solid (cm3 mol-1): 
+++     ++
+++     ++                                                
+++     ++
+++     ++    Solid aminium sulphate
+++     ++    ----------------------
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 14a ++ -> solution saturated with respect to the solid:  
+++ 14b ++ -> Enthalpy change for Ks (kJ mol-1): 50.
+++ 14c ++ -> Heat capacity change (J mol-1 K-1): 30.
+++ 14d ++ -> Molar volume of this salt (cm3 mol-1): 
+++     ++
+++     ++
+++     ++
+++     ++    Solid aminium nitrate
+++     ++    ---------------------
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 15a ++ -> solution saturated with respect to the solid: 
+++ 15b ++ -> Enthalpy change for Ks (kJ mol-1): 50.
+++ 15c ++ -> Heat capacity change (J mol-1 K-1): 30.
+++ 15d ++ -> Molar volume of this salt (cm3 mol-1): 
+++     ++
+++     ++
+++     ++
+++     ++    Solid aminium chloride
+++     ++    ----------------------
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 16a ++ -> solution saturated with respect to the solid: 0.
+++ 16b ++ -> Enthalpy change for Ks (kJ mol-1): 50.
+++ 16c ++ -> Heat capacity change (J mol-1 K-1): 30.
+++ 16d ++ -> Molar volume of this salt (cm3 mol-1): 
+++     ++
++++++++++
+++ END ++
+++INPUT++
+++BLOCK++
++++++++++
+
+
++++++++++
+++START++
+++INPUT++
+++BLOCK++
++++++++++
+++ 3a  ++ -> Compound Name: DMA
+++ 3b  ++ -> Molar Mass (g): 45.08D0 
+++     ++    
+++     ++    
+++     ++    
+++ 4   ++ -> Molar Volume (cm3 mol-1): 66.255D0
+++     ++    
+++     ++    
+++     ++
+++ 5   ++ -> Organic case number (defines partitioning behaviour): 1
+++     ++    
+++     ++    
+++     ++    
+++     ++    1st Dissociation Constant (mol kg-1),
+++ 6a  ++ ->   for the reaction A(aq) = H+(aq) + B-(aq): 
+++ 6b  ++ -> Enthalpy change (kJ mol-1): 
+++ 6c  ++ -> Name of Anion B-(aq): 
+++     ++    
+++     ++    2nd Dissociation Constant (mol2 kg-2),
+++ 7a  ++ ->   for the reaction A(aq) = 2H+(aq) + C--(aq): 
+++ 7b  ++ -> Enthalpy change (kJ mol-1): 
+++ 7c  ++ -> Name of Anion C--(aq): 
+++     ++
+++     ++
+++     ++
+++     ++    Mono- and di-amines, 1st Dissociation Constant (mol kg-1),
+++ 8a  ++ ->   for the reaction +H3NR(aq) = H+(aq) + H2NR(aq): 1.8621D-11
+++ 8b  ++ -> Enthalpy change (kJ mol-1): 49.450
+++ 8c  ++ -> Name of amine cation +H3NR(aq): DMA+
+++     ++    
+++     ++    Di-amines, 2nd Dissociation Constant (mol2 kg-2),
+++ 9a  ++ ->   for the reaction +H3RNH3+(aq) = 2H+(aq) + H2NRNH2(aq): 
+++ 9b  ++ -> Enthalpy change (kJ mol-1): 
+++ 9c  ++ -> Name of amine cation +H3NRNH3+(aq): 
+++     ++
+++     ++
+++     ++
+++     ++    Activity calculations for the solute in the aqueous phase
+++     ++    ---------------------------------------------------------
+++ 10a ++ -> Equation for this solute (1,2,3,4): 4
+++ 10b ++ -> Parameters or groups for the equation: 1*CH3 1*CH3NH
+++     ++    *Choices: 1 - Raoult's law
+++     ++              2 - McGlashan eqn. (enter parameters)
+++     ++              3 - Pitzer Simonson Clegg eqn. (enter parameters)
+++     ++              4 - UNIFAC (enter structural groups)
+++     ++
+++ 10c ++ -> Overall activity model, if member of solute group (1,2,4): 4 
+++     ++    *Choices: 1 - Individual component (no group)
+++     ++              2 - Zdanovskii-Stokes-Robinson
+++     ++              4 - UNIFAC
+++     ++
+++     ++    Activity calculations for the solute in the second liquid phase
+++     ++    ---------------------------------------------------------------
+++ 10d ++ -> Equation for this solute (1,2,3,4): 4
+++ 10e ++ -> Parameters or groups for the equation: 
+++     ++    *Choices: 1 - Raoult's law
+++     ++              2 - McGlashan eqn. (enter parameters)
+++     ++              3 - Pitzer Simonson Clegg eqn. (enter parameters)
+++     ++              4 - UNIFAC (enter structural groups)
+++     ++
+++ 10f ++ -> Overall activity model, if member of solute group (1,2,4): 4
+++     ++    *Choices: 1 - Individual component (no group)
+++     ++              2 - Zdanovskii-Stokes-Robinson
+++     ++              4 - UNIFAC
+++     ++
+++     ++
+++     ++
+++     ++    Surface tension parameters for the undissociated
+++     ++    organic, to yield surface tension in mN m-1.
+++     ++    ------------------------------------------------
+++ 11a ++ -> a_ws: 
+++ 11b ++ -> b_ws:
+++ 11c ++ -> a_sw:
+++ 11d ++ -> b_sw:
+++ 11e ++ -> c1:
+++ 11f ++ -> c2:
+++     ++
+++     ++
+++     ++
+++     ++    Volatility
+++     ++    ----------
+++ 12a ++ -> Henry's law constant (KH, mol kg-1 atm-1): 3.1410D+01
+++ 12b ++ -> Enthalpy change for KH (kJ mol-1): 33.26
+++ 12c ++ -> Heat capacity change (J mol-1 K-1):
+++     ++    
+++     ++                  ** OR **
+++     ++    
+++ 12d ++ -> Vapour pressure of the Pure Compound (p0, atm): 
+++ 12e ++ -> Enthalpy change for p0 (kJ mol-1):              
+++ 12f ++ -> Heat capacity change (J mol-1 K-1): 
+++ 12g ++ -> Value of ln(fOrg) (see note below): 
+++ 12h ++ -> 1st differential of ln(fOrg) with respect to T:
+++ 12i ++ -> 2nd differential of ln(fOrg) with respect to T:
+++     ++    *Note: fOrg is the mole fraction activity
+++     ++     coefficient at infinite dilution in water,
+++     ++     for a reference state of the pure liquid 
+++     ++     organic compound.
+++     ++    *Leave 10g-10i blank if unknown (and 
+++     ++     values will be assumed to be zero).
+++     ++                                                
+++     ++
+++     ++
+++     ++    Solid
+++     ++    -----
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 13a ++ -> solution saturated with respect to the solid: 3.62D+01
+++ 13b ++ -> No. of water molecules of hydration: 
+++ 13c ++ -> Enthalpy change for Ks (kJ mol-1):  
+++ 13d ++ -> Heat capacity change (J mol-1 K-1): 
+++ 13e ++ -> Molar volume of the solid (cm3 mol-1): 
+++     ++
+++     ++                                                
+++     ++
+++     ++    Solid aminium sulphate
+++     ++    ----------------------
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 14a ++ -> solution saturated with respect to the solid:   
+++ 14b ++ -> Enthalpy change for Ks (kJ mol-1): 50.
+++ 14c ++ -> Heat capacity change (J mol-1 K-1): 30.
+++ 14d ++ -> Molar volume of this salt (cm3 mol-1): 
+++     ++
+++     ++
+++     ++
+++     ++    Solid aminium nitrate
+++     ++    ---------------------
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 15a ++ -> solution saturated with respect to the solid:   
+++ 15b ++ -> Enthalpy change for Ks (kJ mol-1): 50.
+++ 15c ++ -> Heat capacity change (J mol-1 K-1): 30.
+++ 15d ++ -> Molar volume of this salt (cm3 mol-1): 
+++     ++
+++     ++
+++     ++
+++     ++    Solid aminium chloride
+++     ++    ----------------------
+++     ++    Activity (Ks, on a molality basis) in a    
+++ 16a ++ -> solution saturated with respect to the solid:   
+++ 16b ++ -> Enthalpy change for Ks (kJ mol-1): 50.
+++ 16c ++ -> Heat capacity change (J mol-1 K-1): 30.
+++ 16d ++ -> Molar volume of this salt (cm3 mol-1): 
+++     ++
++++++++++
+++ END ++
+++INPUT++
+++BLOCK++
++++++++++

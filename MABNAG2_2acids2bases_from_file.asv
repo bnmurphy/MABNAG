@@ -1,0 +1,528 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code for condensation model MABNAG                                      %
+%                                                                         %
+% By Taina Yli-Juuti, University of Helsinki, taina.yli-juuti@helsinki.fi %
+% This version was released in January 2013.                              %
+%                                                                         %
+% MABNAG (Model for Acid-Base chemistry in NAnoparticel Growth) is a      %
+% model for condensational growth of a single aerosol particle (or a      %
+% monodisperce particle population). Inputs for the model are gas phase   %
+% concentrations of the condensing vapors, temperature, initial particle  %
+% size and composition and properties of vapors. In addition for the gas  % 
+% phase mass transportation of the vapors to the particle, MABNAG takes   %
+% into account particle phase acid-base chemistry. Both composition and   %
+% size dependence are accounted for in the equilibrium vapor pressures.   %
+%                                                                         %
+% MABNAG uses thermodynamic equilibrium model E-AIM (by S. Clegg et al.   %
+% for calculating the dissociation/protonation of acids/bases in the      %
+% particle phase and the equilibrium vapor pressures.                     %
+% This version uses the version of E-AIM executable file test.exe which   %
+% allows longer input file rows -> higher presision.                      %
+%                                                                         %
+%                                                                         %
+% Modified from the code MABNAG_2acids2bases1neutral.m                    %
+%                                                                         %
+% Modifications:                                                          %
+% Neutral component removed. This is now MABNAG2. (T.Y. 29.8.2012)        %
+%                                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                         %
+% This is a code for making model runs with input values loaded from a    %
+% file.                                                                   %
+% compounds do not change between the runs.                               %
+%                                                                         %
+% To run this code you need to have in the same folder the following:     %
+% 1) MABNAG2_2acids2bases_from_file.m (the main part of the model)        %
+% 2) calc_equil_water_NH3_and_amine_eaim_MABNAG2_hd (function for calling %
+%    E-AIM to calculate the dissociation and equilibrium vapor pressures) %
+% 3) flx_eaim_MABNAG2_hd_pd (function for calculating the mass fluxes)    %
+% 4) test.exe                                                             %
+% 5) unifac.dat (define the structure of organic compounds in here when   %
+%    UNIFAC is chosen for calculating the activities of organic compounds %
+%    in E-AIM)                                                            %
+% 6) eaimtr.org (define in here the other properties of organic compounds %
+%    needed in E-AIM)                                                     %
+% 7) test.dat                                                             %
+% 8) test.res                                                             %
+% 9) unifac.mst                                                           %
+% 10) singlesol.err                                                       %
+%                                                                         %
+% If E-AIM encounters an error a file eaimtr.err will appear and the      %
+% error message is printed in there                                       %
+%                                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This version is for a system with 2 acids, 2 bases and water:           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%close all
+clear variables
+
+% cd('C:\CLOUD\E-AIM\MABNAG_updatedversion')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Read the inputs from a file %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Read the inputs from a file
+[num, txt] = xlsread('MABNAG2_inputs_example.xlsx');
+
+% Rows in num:
+% 1 = Run number
+% 2 = Temperature T ( C )
+% 3 = RH
+% 4 = Gas phase concentration of acid 1 c_a(1) (cm^-3)
+% 5 = Gas phase concentration of acid 2 c_a(2) (cm^-3)
+% 6 = Gas phase concentration of base 1 c_b(1) (cm^-3)
+% 7 = Gas phase concentration of base 2 c_b(2) (cm^-3)
+% 8 = Gas phase concentration of the neutral organic compound c_n (cm^-3) (Not used in this code)
+% 9 = Initial number of molecules of water in the particle Ni(1)
+% 10 = Initial number of molecules of acid 1 in the particle Ni(2)
+% 11 = Initial number of molecules of acid 2 in the particle Ni(3)
+% 12 = Initial number of molecules of base 1 in the particle Ni(4)
+% 13 = Initial number of molecules of base 2 in the particle Ni(5) 
+% 14 = Initial number of molecules of neutral organic compound in the particle Ni(6) (Not used in this code)
+% 15 = particle number concentration NumbConc (cm^-3)
+% 16 = p_sat(3) (Pa) (Not used in this code)
+% 17 = p_sat(6) (Pa) (Not used in this code)
+% 18 = pKa1 of the acid 2 (Not used in this code)
+% 19 = pKa2 of the acid 2 (Not used in this code)
+% 20 = molar volume of acid 2 (cm3 mol-1) (Not used in this code)
+% 21 = acid 2 (Not used in this code)
+% 22 = Molar mass of the acid 2 M(3) (g/mol)
+% 23 = solving method (Not used in this code)
+% 24 = iteration difference (maximum allowed relative difference in the iteration of composition for water, NH3 and amine) (Not used in this code)
+
+% Select the run number
+model_run_number = 1;
+
+column_run = find(num(1,:) == model_run_number);
+
+% Name of the run. This is used in the output file name.
+run_number = ['run' num2str(model_run_number)];
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Constants %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Gas constant (J K^-1 mol^-1)
+R = 8.314472;
+% Boltzmann constant (m^2 kg s^-2 K^-1)
+k = 1.3806503e-23;
+% Avogadro constant (mol^-1)
+NA = 6.0221415e+23;
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Inputs: ambiet conditions and initial composition of a particle %%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Compounds:                                                              %
+% 1 = water                                                               %
+% 2 = acid 1 (sulfuric acid)                                              %
+% 3 = acid 2 (organic acid)                                               %
+% 4 = base 1 (ammonia)                                                    %
+% 5 = base 2 (amine)                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% Environmental conditions
+% Temperature (K)
+T = 273.15 + num(2,column_run);
+% Pressure (Pa)
+press = 101325.;
+% Relative humidity (%)
+RH = num(3,column_run);
+
+
+% Gas phase molecular concentrations
+% Acids (molecules/m3) [acid1 acid2]
+c_a = [num(4,column_run) num(5,column_run)].*1e6;
+% Bases (molecules/m3) [base1 base2]
+c_b = [num(6,column_run) num(7,column_run)].*1e6;
+
+
+% Initial composition of particles
+% = Number of molecules [water acid1 acid2 base1 base2]
+Ni = [num(9,column_run)  num(10,column_run) num(11,column_run) ...
+      num(12,column_run) num(13,column_run)];
+
+
+% Particle number concentration (m^-3). This is used to increase the number
+% of moles in E-AIM calculations. The value of NumbConc should not affect
+% the results.
+NumbConc = num(15,column_run)*1e+6;
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Inputs: Properties of the compounds %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Molar masses (kg/mol)
+M = [0.018 0.098 num(22,column_run)*1e-3 0.017 0.045 ...
+     0.018 0.098 num(22,column_run)*1e-3 0.017 0.045];
+
+% Densities of the compounds (kg/m^3)
+rhoi = [1500 1500 1500 1500 1500];
+
+% Surface tension (N/m)
+sigmai = [0.03 0.03 0.03 0.03 0.03];
+
+% Diffusion coefficients (m2/s)
+D = [21.485e-6 9.3803e-6 num(23,column_run) 19.0e-6 10.5e-6].*(T/273.15).^1.75;
+
+% Mass accommodation coefficients
+alpham = [1.0 1.0 1.0 1.0 1.0];
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Calculation starts here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Converting gas concentrations (molecules/m^3) to pressures (Pa)
+p_a = c_a.*k.*T;
+p_b = c_b.*k.*T;
+
+
+% Calculating ambient partial pressure of water vapor.
+% Coefficients from 1-component model file models.gro
+A_w = [77.34491296e+0; 7235.424651e+0; 0.82e+1; 0.0057113e+0; 0.e+0];
+psat_w = exp(A_w(1) - A_w(2)/T - A_w(3)*log(T) + A_w(4)*T + A_w(5)*T^2);
+p_w = RH/100 * psat_w;
+
+% All Vapor Pressures in Pa
+pvi = [p_w p_a p_b];
+
+% Mole concentrations of all vapors [mol/m3]
+mgi = pvi ./ (R.*T);
+
+% Mole concentration of each component [mol/m3]
+mpi = Ni ./ NA .* NumbConc;
+
+% Mass of a particle [kg/particle]
+mp = sum( mpi .* M(1:5) ./ NumbConc );
+
+% Mass fractions
+Xmass = ( mpi .* M(1:5) ./ NumbConc )./mp;
+
+% Mole fractions
+Xmole = Ni./sum(Ni);
+
+% Density of the particle (kg/m^3) weighted by mass fractions
+rho = ( sum(Xmass./rhoi) )^(-1);
+
+% Initial radius of the particle
+rp0 = (3*(mp/rho)/(4*pi)).^(1.0/3.0);
+rp_median  = rp0;
+
+disp(['Initial radius of the particle is ' num2str(rp0) ' m.'])
+
+% Surface tension weighted by Mole Fraction
+sigma = sum(Xmole.*sigmai);
+
+% Kelvin effect
+Ke = exp(2.* M(1:5) .* sigma ./R./T./rp0./ rhoi);
+
+% Inputs for calculation of particle composition and size as a function of 
+% time: only variables are the masses in the particulate phase and gas phase.
+input = [mpi'; mgi'] ; %[mol m-3]
+
+
+
+% Using a solver to solve the differential equations. E-AIM calculates the
+% equilibrium and the flux differential equation handles the dynamic
+% growth.
+
+% Time intervals for the E-AIM calculation
+%starttimes = [logspace(-3,2,100) linspace(101,3600,400) linspace(3601,43200,1300)];
+%starttimes = [logspace(-3,0,5) logspace(0.03,1,5) logspace(1.01,2,5) linspace(100.1,3200,25) linspace(3201,4320000,10000)];
+%starttimes = [logspace(-3,0,5) logspace(0.03,1,8) logspace(1.01,2,5) linspace(100.1,3200,25) linspace(3201,4320000,10000)];
+%starttimes = [logspace(-3,0,15) logspace(0.03,1,24) logspace(1.01,2,15) linspace(100.1,3200,75) linspace(3201,4320000,100000)];
+%starttimes = [logspace(-3,0,15) logspace(0.03,1,24) logspace(1.01,2,15) linspace(100.1,3200,75) linspace(3201,4320000,30000)];
+%starttimes = [logspace(-3,0,15) logspace(0.03,1,24) logspace(1.01,2,15) linspace(100.1,3200,75) linspace(3201,4320000,70000)];
+%starttimes = [logspace(-3,0,15) logspace(0.03,1,25) logspace(1.01,2,15) linspace(100.1,4000,100) linspace(4001,8000,70) linspace(8001,12000,50),linspace(12001,16000,30) linspace(16001,4320000,30000)];
+%starttimes = [logspace(-3,0,15) logspace(0.03,1,25) logspace(1.01,2,15) linspace(100.1,4000,100) linspace(4001,8000,50) linspace(8001,12000,30),linspace(12001,16000,15) linspace(16001,4320000,30000)];
+%starttimes = [logspace(-3,0,15) logspace(0.03,1,25) logspace(1.01,2,15) linspace(100.1,5000,100) linspace(5001,15000,100) linspace(15001,35000,100),linspace(35001,75000,100) linspace(75001,4320000,30000)];
+%starttimes = [logspace(-3,0,20) logspace(0.03,1,30) logspace(1.01,2,20) linspace(100.1,5000,120) linspace(5001,15000,120) linspace(15001,35000,120),linspace(35001,75000,120) linspace(75001,4320000,30000)];
+%starttimes = [logspace(-3,0,20) logspace(0.03,1,30) logspace(1.01,2,20) linspace(100.1,5000,150) linspace(5001,15000,150) linspace(15001,35000,150),linspace(35001,75000,150) linspace(75001,4320000,30000)];
+%starttimes = [logspace(-3,0,5) logspace(0.03,1,15) logspace(1.01,2,5) linspace(100.1,5000,30) linspace(5001,15000,30) linspace(15001,35000,30),linspace(35001,75000,30) linspace(75001,4320000,3000)];
+%starttimes = [logspace(-3,2,70) linspace(115,432000,7000)];
+%starttimes = [logspace(-3,2,50) linspace(115,432000,9000)];
+%starttimes = [logspace(-3,2,50) linspace(115,432000,3000)];
+%starttimes = [logspace(-3,2,50) linspace(115,432000,4000)];
+starttimes = [logspace(-3,2,50) linspace(115,432000,3500)];
+
+
+tout = [];
+output = [];
+rp_out = [];
+t_rp_out = [];
+moles_of_ions = [];
+sigma_dens_var = []; % added by LA
+jj = 0;
+time_start_loop = 0.;
+rho_LA = [];
+sigma_LA = [];
+input_LA = [];
+while time_start_loop < 2000*starttimes(end-2)
+    jj = jj+1;
+    start_time = log10(starttimes(jj));
+    end_time = log10(starttimes(jj+1));
+    time_start_loop = 10^start_time;
+    time = logspace(start_time,end_time,10);
+    
+    %%%%%%%%%%%%%%%%%%%%
+    % Calculate the amount of bases and water and the equilibrium vapor pressures 
+    % of each compound with E-AIM
+    %   input -> (1-5) particle phase conc. (mol m-3)
+    %            (6-10)vapor phase concentration (mol m-3)
+    %   pvi   -> Vapor Pressure (Pa)
+    input_LA = [input_LA; input'];
+    input'
+    pvi
+    [p_sat] = ...
+        calc_equil_water_NH3_and_amine_eaim_MABNAG2_hd(input',RH,T,M,rho,...
+        sigma,NumbConc,rp_median);
+    %%%%%%%%%%%%%%%%%%%%
+    
+    p_sat
+    %Convert input array from mol/m3 to mass/m3
+    input = input .* M';
+    
+    % Solve the differential equation for mass flux of acids with the new
+    % p_sat. Pvi and Psat are not assumed to be constant throughout this time
+    % step; Pvi is recalculated inside as a function of the vapor mol 
+    % concentration. The Kelvin effect is not incorporated into the Psat value 
+    % and will be applied inside the flux function so that it can change as 
+    % the particles grow. In theory, the call to E-AIM could happen inside 
+    % the function but we want it outside so we can control surface/bulk
+    % calculations later on.
+    options = odeset('RelTol',1E-12,'AbsTol',1E-20);
+    [tout1 output1 exitflag1] = ode15s(@flx_eaim_MABNAG2_hd_pd,time,[input],...
+        options,R,k,T,press, M, rhoi, p_sat, sigmai, D, alpham, NumbConc, ...
+        rho, sigma);
+    
+    %Update Output Arrays
+    tout = [tout; tout1(2:end)];  %time [s]
+    output = [output; output1(2:end,1:5)]; %Particle Phase [kg m-3]
+    out.mass_ptcl = [out.mass_ptcl output1(2:end,1:5) ./ NumbConc ]; %[kg ptcl-1]
+    
+    %Update Input for Next Time Step [mol/m3]
+    input_old = input ./ M';
+    input = output(end,:)' ./ M';
+    pvi = input(6:10) .* R .* T;  %Partial Pressure of all Vapors [Pa]
+    
+
+    % Median properties wrt time:
+    mpi = median(output1(:,1:5),2) ./ NumbConc;  %[kg particle-1]
+    Xmass = mpi ./ sum(mpi);
+    Xmole = (Xmass ./ M(1:5) ) ./ sum(Xmass ./ M(1:5) );
+    rho = ( sum(Xmass./rhoi) )^(-1);  %[kg m-3]
+    sigma = sum(Xmole.*sigmai);   %[N m-1]
+    rp_median = (3./(4.*pi)*sum(mpi)./rho).^(1/3)
+    
+    %Collect Masses and Moles into Output Arrays
+    moles_ions = sum( input(1:5) );  %[mol/m3]
+    mass_all_1 = output1(1,1:5) ./ NumbConc;  %[kg m-3] 
+    moles_of_ions = [moles_of_ions; tout1(1) (3./(4.*pi)*sum(mass_all_1)./rho).^(1/3)...
+        moles_ions p_sat];
+    
+    % If radius is > 20e-9 nm the calculation will stop
+    %if rp_median > 20e-9
+    %    break
+    %end
+    
+    
+    %%%%%% added by LA %%%%%%%
+    moles_LA = out.mass_ptcl ./ repmat( M(1:5),length(tout),1 );  %[mol ptcl-1]
+    Xmole_LA = moles_LA./repmat(sum(moles_LA,2),1,5);  %Mole Fraction
+    rp_LA = (3/(4*pi)*sum( out.mass_ptcl ,2)./rho).^(1/3);      %Particle Radius
+    rpdry_LA = (3/(4*pi)*sum( out.mass_ptcl (:,2:3),2)./rho).^(1/3);  %Particle Radius without 
+                                                             %water or bases
+    rho_LA = [rho_LA; rho];
+    sigma_LA = [sigma_LA; sigma];                                                             
+                                                             
+    sigma_dens_var = [sigma_dens_var; repmat(sigma,9,1) repmat(rho,9,1)];
+                            %Surface Tension and Density
+    
+    %Make Diagnostic Figures
+    figure(103)   
+    clf
+    subplot(2,3,1)  %Mole Fraction vs Diameter
+                    %  rp_La [m]; Xmole_LA [--]
+    plot(rp_LA*2*1e9,Xmole_LA(:,1),'b')
+    hold on
+    plot(rp_LA*2*1e9,Xmole_LA(:,2),'r')
+    plot(rp_LA*2*1e9,Xmole_LA(:,5),'y')
+    plot(rp_LA*2*1e9,Xmole_LA(:,3),'g')
+    plot(rp_LA*2*1e9,Xmole_LA(:,4),'m')
+    legend('water','H2SO4','amine','org acid','NH3','location','southwest')
+    ylabel('Molar fractions','fontsize',13)
+    xlabel('D_p (nm)','fontsize',13)
+    %set(gca,'xlim',[0 max(rp_LA*2)*1e9])
+    title('H2SO4=6.5e6 molec cm^{-3} DMA 3.30e8 molec cm^{-3} (12.5 ppt)','fontsize',13)
+    grid on
+    
+    subplot(2,3,2)   %Diameter vs. Dry Molar Ratio (Amine to SO4--)
+                     % rp_LA [m]; Xmole_LA [--]
+    plot(rp_LA*2*1e9,Xmole_LA(:,5)./Xmole_LA(:,2),'b')
+    ylabel('Dry molar ratio','fontsize',13)
+    xlabel('D_p (nm)','fontsize',13)
+    set(gca,'ylim',[0 2.5])
+    grid on
+    
+    subplot(2,3,3)   %Dry Diameter vs. Dry Molar Ratio (Amine to SO4--)
+                     % rp_LA [m]; Xmole_LA [--]
+    plot(rpdry_LA*2*1e9,Xmole_LA(:,5)./Xmole_LA(:,2),'b')
+    hold on
+    plot([2 2],[0 2.5],'k')
+    plot([3 3],[0 2.5],'k')
+    plot([5 5],[0 2.5],'k')
+    plot([10 10],[0 2.5],'k')
+    plot([20 20],[0 2.5],'k')
+    ylabel('Dry molar ratio','fontsize',13)
+    xlabel('Dry D_p (nm)','fontsize',13)
+    set(gca,'ylim',[0 2.5],'xlim',[0 20])
+    grid on
+    
+    subplot(2,3,4)    %Diameter vs. Surf Tens AND Density
+                      %  rp_LA [m]; sigma_dens_var(1) [N m-1]; sigma_dens_var(2) [kg m-3]
+    [ax,h1,h2] = plotyy(rp_LA*2*1e9,sigma_dens_var(:,1),rp_LA*2*1e9,sigma_dens_var(:,2));
+    ylabel(ax(1),'Surface tension (N m^{-1})','fontsize',13)
+    ylabel(ax(2),'Density (kg m^{-3})','fontsize',13)
+    xlabel('Particle diameter (nm)','fontsize',13)
+    grid on
+    
+    subplot(2,3,5)    %Diamter vs. Molar Conc.
+                      %  rp_LA [m]; moles_LA [mol/particle]
+    plot(rp_LA*2*1e9,moles_LA(:,1),'b')
+    hold on
+    plot(rp_LA*2*1e9,moles_LA(:,2),'r')
+    plot(rp_LA*2*1e9,moles_LA(:,5),'y')
+    plot(rp_LA*2*1e9,moles_LA(:,3),'g')
+    plot(rp_LA*2*1e9,moles_LA(:,4),'m')
+    legend('water','H2SO4','amine','org acid','NH3')
+    ylabel('Molar conc (moles)','fontsize',13)
+    xlabel('D_p (nm)','fontsize',13)
+    grid on
+    
+    subplot(2,3,6)    %Time vs. Diamter
+                      %  tout [s]; rp_LA [m]
+    plot(tout/3600,rp_LA*2*1e9)
+    xlabel('Time (h)','fontsize',13)
+    ylabel('Particle diameter (nm)','fontsize',13)
+    grid on
+end
+    
+
+% Summarize the mass of species in each particle
+mp = sum(out.mass_ptcl,2);    
+Xmass = out.mass_ptcl ./ repmat( mp,1,5 );
+rho = ( sum(Xmass./repmat(rhoi,length(Xmass),1),2) ).^(-1);
+rp_out =( 3/(4*pi) * mp ./ rho).^(1/3);
+
+clear Xmole rp
+
+model_result = [tout rp_out Xmass out.mass_ptcl];
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Save the result in files %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+tiedosto = ['mabnag2_output_' run_number '.dat'];
+save(tiedosto, 'model_result','-ascii')
+
+tiedosto2 = ['mabnag2_output_' run_number '_ions.dat'];
+save(tiedosto2, 'moles_of_ions','-ascii')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot the result %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+rp = rp_out;
+
+figure
+semilogx(rp,Xmass(:,1),'c')
+hold on
+plot(rp,Xmass(:,2),'r')
+plot(rp,Xmass(:,3),'g')
+plot(rp,Xmass(:,4),'b')
+plot(rp,Xmass(:,5),'m')
+legend('water','H2SO4','Org. acid','ammonia','amine')
+ylabel('X_{mass}')
+xlabel('r_p')
+
+
+figure
+plot(tout,rp)
+ylabel('r_p')
+xlabel('time')
+
+
+moles = out.mass_ptcl./repmat(M,length(tout),1);
+Xmole = moles./repmat(sum(moles,2),1,5);
+
+figure
+plot(tout,Xmole(:,1),'c')
+hold on
+plot(tout,Xmole(:,2),'r')
+plot(tout,Xmole(:,3),'g')
+plot(tout,Xmole(:,4),'b')
+plot(tout,Xmole(:,5),'m')
+legend('water','H2SO4','Org. acid','ammonia','amine')
+ylabel('X_{mole}')
+xlabel('time (s)')
+
+
+figure
+plot(tout,out.mass_ptcl(:,1),'c')
+hold on
+plot(tout,out.mass_ptcl(:,2),'r')
+plot(tout,out.mass_ptcl(:,3),'g')
+plot(tout,out.mass_ptcl(:,4),'b')
+plot(tout,out.mass_ptcl(:,5),'m')
+legend('water','H2SO4','Org. acid','ammonia','amine')
+ylabel('mass (kg)')
+xlabel('time (s)')
+
+
+figure(10)
+hold on
+subplot(2,2,1)
+plot(rp*2*1e9,Xmole(:,1),'c')
+hold on
+plot(rp*2*1e9,Xmole(:,2),'r')
+%plot(rp*2,Xmole(:,3),'g')
+%plot(rp*2,Xmole(:,4),'b')
+plot(rp*2*1e9,Xmole(:,5),'m')
+legend('water','H2SO4','amine')
+ylabel('Molar fractions','fontsize',13)
+xlabel('D_p (nm)','fontsize',13)
+set(gca,'xlim',[0 25])
+
+a = Xmole(:,2)/(Xmole(:,2)+Xmole(:,5));
+subplot(2,2,2)
+plot(rp*2*1e9,Xmole(:,2)./(Xmole(:,2)+Xmole(:,5)),'r')
+hold on
+plot(rp*2*1e9,Xmole(:,5)./(Xmole(:,2)+Xmole(:,5)),'m')
+legend('H2SO4','amine')
+ylabel('Molar fractions (water excluded)','fontsize',13)
+xlabel('D_p (nm)','fontsize',13)
+
+(rp(length(rp))-rp(1))*2/(tout(length(tout))/3600-tout(1)/3600)   % GR
+
+

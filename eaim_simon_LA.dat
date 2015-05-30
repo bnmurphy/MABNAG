@@ -1,0 +1,349 @@
++      =============================================================                   +
++      INPUT DATA FILE FOR INORGANIC AND ORGANIC AMOUNTS AND OPTIONS                   +
++                                                                                      +
++                 This text file must be called eaim.dat                               +
++                                                                                      +
++                 (these notes last edited 28/10/2014)                                 +
++      =============================================================                   +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++  This is the input file for E-AIM.                                                   +   
++                                                                                      +   
++  These notes explain how to enter the input data for problems to be solved by        +   
++  one of the E-AIM models. The data for each problem must be entered in this file,    +   
++  on a single line, as a series of integer and real numbers. As many problems can     +   
++  be entered as necessary (one problem per line).                                     +   
++                                                                                      +   
++  The user must also specify which of the E-AIM models is going to be                 +   
++  used for the calculations.                                                          +   
++                                                                                      +   
++                                                                                      +   
++  The model creates the following output files:                                       +   
++                                                                                      +   
++  eaim.rs1 - contains all results for each problem, in a verbose and easy-to-         +   
++             understand format (the same as the web-based model for 'normal'          +   
++             output).                                                                 +   
++                                                                                      +   
++  eaim.r2a - output in column format. This file contains P, V, T, RH, the volume      +   
++             of the aqueous phase (aq) and the moles (n_) of each species there,      +
++             the equilibrium partial pressures (p_) of gases, and moles of solids.    + 
++                                                                                      +   
++  eaim.r2b - output in column format. Contains the total volume and moles (n_) of     +   
++             each species present in the hydrophobic (organic) liquid phase (li),     +   
++             if it exists.                                                            +   
++                                                                                      +   
++  eaim.r3a - output in column format. Contains the following properties of the        +
+"+             aqueous phase: density, and surface tension; then molalities (m_), mole  +"
++             fractions (x_) and mole fraction activity coefficients (f_) of the       +
++             species present. Equilibrium partial pressures (p_) of gases are also    +
++             listed.                                                                  +
++                                                                                      +
++  eaim.r3b - output in column format. Contains the same as eaim.r3a, but for the      +
++             hydrophobic (organic) liquid phase, if it exists.                        +                                                               +
++                                                                                      +
++  eaim.rs4 - the total amounts (moles) of each component ion and/or organic compound  +
++             in the system in all forms. So, for example, total ammonium in a system  +
++             would be the sum of NH4+ and NH3 in the aqueous phase, NH4+ present in   +
++             any ammonium salts, and gas phase NH3.                                   +
++                                                                                      +
++  eaim.rs5 - this file can be ignored.                                                +
++                                                                                      +
++  The contents of the five files eaim.r2a to eaim.rs4, above, are similar to the      +
+"+  results displayed by the web-based E-AIM when it is run for a ""Parametric""          +"
++  calculation (e.g., http://www.aim.env.uea.ac.uk/aim/model2/mod2rhw.php) and         +
+"+  ""Column"" output is selected. The explanatory notes provided at the end of           +"
++  the results for these calculations of the web-based model may be helpful in         +
++  understanding the files.                                                            +
++                                                                                      +
++                                                                                      +
++  Error messages are written to the file eaim.rs1, so if processing stops             +   
++  unexpectedly, look in that file (at the end). Detailed instructions for             +   
++  the input are given below in sections 1 to 5. Note that, for systems                +   
++  that only contain inorganic compounds, section 3 (on organic compounds)             +   
++  can be ignored.                                                                     +   
++                                                                                      +   
++  Do NOT alter these notes, which are ended by a row of '####'.                       +   
++                                                                                      +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++  1. SPECIFY THE INORGANIC MODEL (I, II, III, or IV)                                  +
++  ==================================================                                  +
++                                                                                      +
++  The first piece of information that must be provided by the user following          +
++  these notes is the name of the E-AIM model to be used, which corresponds            +
++  to those on the website (http://www.env.uea.ac.uk/aim/aim.php):                     +  
++                                                                                      +
++      Model I  : H+ - SO42- - NO3- - Cl- - Br- - H2O         (<200 to 330 K)          +
++      Model II : H+ - NH4+ - SO42- - NO3- - H2O              (<200 to 330 K)          +
++      Model III: H+ - NH4+ - Na+ - SO42- - NO3- - Cl- - H2O  (298.15 K only)          +
++      Model IV : H+ - NH4+ - Na+ - SO42- - NO3- - Cl- - H2O  (<263 to 330 K)          +
++                                                                                      +
++  The model name must be entered after the ':' at the end of the following            +
++  line, which can be found just above the row of '####' that marks the end            +
++  of these notes and the start of the input data:                                     +
++                                                                                      +
++     Enter the model name (Model I, Model II, Model III, or Model IV):                +
++                                                                                      +
+"+  Thus, for example, if Model II is needed then ""Model II"" (without quotes)           +"
++  should be entered on the line, after the semi-colon. (NB: the above copy of         +
++  the line is altered so that it is not read by E-AIM instead of the real input       +
++  line.)                                                                              +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++  2. ENTER THE INORGANIC AMOUNTS AND OPTIONS:                                         +
++  ===========================================                                         +
++                                                                                      +
+"+  Each line of input following the model name, and row of ""####"" that ends these      +"
++  notes, specifies an individual problem to be solved, and contains:                  +
++                                                                                      +
++       * temperature (K)                                                              +
++       * system pressure (generally set this to 1.0 atm.)                             +
++       * system volume (generally set to 1.0 m^3)                                     +
++       * water case number (1, 2 or 3)                                                +
++       * water dissociation option (-1, 0 or 1),                                      +
++       * the fixed RH (as a fraction) or total moles of water depending on the        +
++         value of the water case                                                      +
++       * the numbers of moles of ions and NH3                                         +
++       * integers giving options related to the solid phases and trace                +
++         gas equilibration.                                                           +
++       * amounts of user-specified organic species (properties are entered            +
++         in the eaim.org file), followed by 6 groups of integer options which         +
++         control their behaviour.                                                     +
++                                                                                      +
++  Example input values for a single problem are given below. For inclusion here, the  +
++  line below has been split into two, and the letters beneath each number are for     +
++  explanatory purposes and are not part of the input data.                            +
++                                                                                      +
++  298.15D0  1.000  1.000    1   0   0.420    1.0    2.0    0.0   1.0    1.0           +
++    a         b1     b2    c1  c2     d       e      f      g     h      i            +
++                                                                                      +
++  0.0    0.0    0.0    0.0      3   3   3   3   3       0                             +
++   j      k      l      m       n   o   p   q   r       s                             +
++                                                                                      +
++                                                                                      +
++  The meaning of each value is now described:                                         +
++                                                                                      +
++  a  - temperature (K). Valid range is 180 K to 330 K.                                +
++                                                                                      +
++  b1 - system pressure (here 1 atm). It is recommended at present that this           +
++       value is left unchanged.                                                       +
++                                                                                      +
++  b2 - system volume (here 1 cubic metre).                                            +
++                                                                                      +
++  c1, d - water case (c1, integer) and associated value (d, real). c1 = 1 means       +
++  that the relative humidity of the system is to be fixed to the value of d,          +
++  which in this example is 42% (specified as a fraction).                             +
++                                                                                      +
++  Alternative water options are case c1 = 2, in which case d must be the total        +
++  number of moles of water in the system. Here the program will solve for the         +
++  equilibrium distribution of water and will give the calculated RH as an output.     +
++  For c1 = 3, d is again the total number of moles of water in the system, but in     +
++  this case it is not allowed to partition into the vapour, and remains in the        +
++  condensed phase as a liquid, ice, or water of hydration.                            +
++                                                                                      +
++  c2  - this is the water dissociation option. A value of -1 means that               +
++  dissociation is not calculated for any input conditions. A value of zero means      +
++  that if both numbers of moles of H+  and OH- are zero on input, then H2O            +
++  dissociation will remain off, and neither ion will be a variable in the             +
++  calculations. If either H+ or OH- is present on input, then the other will be       +
++  made a variable and water dissociation will be on. A value of 1 means that          +
++  water dissociation will always be calculated, and both H+(aq) and OH-(aq)           +
++  will be made variables in the calculation, even if their input amounts are zero.    + 
++                                                                                      +
++  e-m - these values are, in order, the numbers of moles of                           +
++  H+, NH4+, Na+, SO4=, NO3-, Cl-, Br-, OH- and NH3 present (see above for valid       +
++  valid combinations of the species for the E-AIM different models).                  +
++                                                                                      +
++  n  -  this controls how gas phase HNO3 is treated by the program. A value           +
++  of '3' means that it is assumed not to occur, hence all NO3- (and associated H+)    +
++  remain in the condensed phase(s). A value of '4' means, again, assume no            +
++  formation of HNO3(g) but report its equilibrium partial pressure over the liquid    +
++  phase (if it exists, and also contains both H+ and NO3-). A value of '0' means      +
++  that HNO3(g) can be formed and will be partitioned between the phases if            +
++  the ions are present. No other values of n are permitted.                           +
++                                                                                      +
++  o  -  as n above, for the gas HCl.                                                  +
++                                                                                      +
++  p  -  as n above, for the gas NH3.                                                  +
++                                                                                      +
++  q  -  as n above, for the gas H2SO4.                                                +
++                                                                                      +
++  r  -  as n above, for the gas HBr.                                                  +
++                                                                                      +
++  s  -  the number of solids whose options are to be individually entered. In the     +
++  above example, s is zero, which means that the program will look for all the        +
++  possible solids that can form and include them in the equilibration.                +
++                                                                                      +
++    If s is equal to 1 or more, then it must be followed by the reference numbers     +
++  and associated option values (both integers) of the s solids to be treated          +
++  specially. For example, '1 10 3' instead of '0' would mean:                         +
++    * 1 solid phase                                                                   +
++    * reference number = 10 (i.e., (NH4)2SO4))                                        +
++    * option = 3 (means exclude from calculation).                                    +
++                                                                                      +
++  The only other available option value is '4', which means exclude from the          +
++  calculation but report the saturation ratio.                                        +
++                                                                                      +
++  Another example, '2  10 3  13 4' instead of '0' means:                              +
++    * 2 solids                                                                        +
++    * 1st solid reference number = 10 (i.e., (NH4)2SO4)                               +
++    * 1st solid option = 3 (means exclude from calculation).                          +
++    * 2nd solid reference number = 13 (i.e., NH4NO3)                                  +
++    * 2nd solid option = 4 (means exclude from calculation)                           +
++                                                                                      +
++                                                                                      +
++  Reference numbers of all the solids in the model are given below:                   +                                                          +
++                                                                                      +
++  Ref: Solid             Ref: Solid                  Ref: Solid                       +
++    1  H2O(ice)           10  (NH4)2SO4               18  Na2SO4                      +
++    2  H2SO4              11  (NH4)3H(SO4)2           19  Na2SO4.10H2O                +
++    3  H2SO4.H2O          12  NH4HSO4                 20  Na3H(SO4)2                  +
++    4  H2SO4.2H2O         13  NH4NO3                  21  NaHSO4.H2O                  +
++    5  H2SO4.3H2O         14  2NH4NO3.(NH4)2SO4       22  NaHSO4                      +
++    6  H2SO4.4H2O         15  3NH4NO3.(NH4)2SO4       23  NaH3(SO4)2.H2O              +
++    7  H2SO4.6.5H2O       16  NH4NO3.NH4HSO4          24  Na2SO4.(NH4)2SO4.4H2O       +
++    8  HNO3.H2O           17  NH4Cl                   25  NaNO3                       +
++    9  HNO3.3H2O                                      26  NaNO3.Na2SO4.H2O            +
++                                                      27  NaCl                        +
++                                                      28  HCl.3H2O                    +
++                                                      29  HNO3.2H2O                   +
++                                                      30  NaCl.2H2O                   +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++  3. USER-SPECIFIED ORGANIC AMOUNTS AND OPTIONS:                                      +
++  ==============================================                                      +
++                                                                                      +
++  The following quantities are entered, in the order given below, for each            +
++  of the N organic solutes specified in the eaim.org file. They should come           +
++  after the last of the inorganic options for the problem, on the same line.          +
++  (If there are no organics, this entire section can be ignored.)                     +
++                                                                                      +
++  A.  moles of each solute, (for organics 1 -> N)                                     +
++  B.  gas options, (1 -> N)                                                           +
++  C.  solid options, (1 -> N)                                                         +
++  D.  mixed solid options, (1 -> N)                                                   +
++  E.  dissociation options, (1 -> N)                                                  +
++  F.  liquid/liquid equilibrium options (1->N)                                        +
++  G.  organic salt options (1 -> 0)                                                   +
++                                                                                      +
++  The integer options values for items A to F above are as follows:                   +
++                                                                                      +
++  0 - allow the gas/solid/mixed solid to form, the dissociation (of                   +           
++      organic acid or base) to occur, or the liquid/liquid equilibrium                +
++      to be calculted if the appropriate quantities have been set in the              +
++      eaim.org file. For example, if a value of the vapour pressure or Henry's        +
++      law constant has been specified then if the option value is 0                   +
++      the compound will be allowed to partition into the gas phase.                   +
++      If the thermodynamic quantity has *not* been specified then the                 +
++      option value will have no effect, and can safely be left at zero.               +
++      In the case of dissociation, of an organic acid or base, a value of             +
++      0 means that the program will calculate the equilibrium.                        +
++                                                                                      +
++  3 - prevent (switch off) gas/solid/mixed solid/dissociation, or a                   +
++      liquid/liquid equilibration, from occuring. So, to use the above                +
++      examples, a value of 3 for the gas option of the organic prevents it            +
++      partitioning into the gas phase even if the compound has been assigned a        +
++      Henry's law constant or vapour pressure. For liquid/liquid equilibrium this     +
++      option constrains any compound that would otherwise be able to partition        +
++      between both liquid phases to exist *only* in the aqueous phase.                + 
++                                                                                      +
++  4 - this option value has the same effect as a value of 3, but the equilibrium      +
++      vapour pressure or solid saturation ratio will be calculated                    +
++      and included in the output.                                                     +
++                                                                                      +
+"+  The ""mixed solid"" formation option, item D, should be set to 3 (ie., switched       +"
++  off) as this feature has not been developed and tested. Note: currently this        +
++  option is reset to 3 internally in E-AIM, and the user input is ignored.            +                                                              +
++                                                                                      +
++  Item G, the organic salt options: The model is able to calculate the formation      +
++  of aminium sulphate, nitrate, and/or chloride salts in systems containing amines    +
++  (that have been neutralised to aminium ions by H+) and the three inorganic anions.  +
++  (Of course the user must also have entered the appropriate equilibrium constants    +
++  in eaim.org.) The options for all three salts are represented by a single integer   +
++  as follows. The option value itself is the sum of the following codes:              +
++                                                                                      +
++     1 - switch off formation of aminium sulphate salt                                +
++     2 - switch off formation of aminium nitrate salt                                 +
++     4 - switch off formation of aminium chloride salt                                +
++                                                                                      +
++  So, if the formation of all three salts is to be switched off then the integer      +
++  option value is 1 + 2 + 4 = 7. If only the sulphate and chloride salts are to       +
++  be switched off then the option value will be 1 + 4 = 5. If only the chloride       +
++  salt is to be switched off then the value of the option is 4. If all salts are      +
++  to be allowed to form then the option value is 0 (zero). This value (i.e., 0)       +
++  shoudl also be used when the organic is not an amine and this option is therefore   +
++  irrelevent.                                                                         +
++                                                                                      +
++  Here is an example of how to input the organic amounts and options:                 +
++                                                                                      +
++  Below is input needed (i.e., following item 't' in section 2 above) for             +
++  a system containing 2 organics (1.0 mole of the first, and 2.5 moles of the         +
++  second). The first organic is an amine (and can form solid sulphate, nitrate, and   +
++  chloride salts). Partitioning of the first organic into the gas phase is switched   +
++  off, as is the aqueous phase dissociation of the second. The formation of the       +
++  aminium nitrate salt (for the first organic only) is switched off:                  +
++                                                                                      +
++  1.0 2.5   3 0   0 0   0 0   0 3   0 0   2 0                                         +
++     A       B     C     D     E     F     G                                          +
++                                                                                      +
++  The letters indicate which pairs of numbers correspond to items A-G above.          +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++  4. EXAMPLE OF A SYSTEM CONTAINING BOTH INORGANIC AND ORGANIC COMPOUNDS              +
++  ======================================================================              +
++                                                                                      +
++  The line of input below specifies a chemical system containing 0.1 mol m-3 of       +
++  H2SO4, 0.15 mol m-3 of (NH4)2SO4, and three organic compounds for which the amounts +
++  are 0.05 0.075 and 0.9 mol m-3. The thermodynamic properties of the three organic   +
++  compounds must be specified in file eaim.org, and the details of how to do this are +
++  described in the header of that text file.                                          +
++                                                                                      +
++  In this system we fix the RH at 0.55 (55%), and prevent the partitioning of H2SO4   +
++  from the condensed phase into the gas phase. We also switch off the formation of    +
++  the solid salt NH4HSO4(s). The second organic compound is an acid, which            +
++  dissociates in the aqueous phase, and in this calculation we prevent the            +
++  dissociation from occurring (ie, we switch it off). Finally, for this example, the  +
++  third organic compound is an amine and the formation of aminium sulphate salt is    +
++  also switched off.                                                                  +
++                                                                                      +
++  Here is the single line of input, split into three parts:                           +
++                                                                                      +
++                                                                                      +
++    298.15D0  1.000  1.000    1   0   0.55     0.2    0.3    0.0   0.25   0.0         +
++      a         b1     b2    c1  c2     d       e      f      g     h      i          +
++                                                                                      +
++    0.0    0.0    0.0    0.0      0   0   0   3   0      1 12 4                       +
++     j      k      l      m       n   o   p   q   r      s                            +
++                                                                                      +
++    0.05 0.075 0.09  0 0 0  0 0 0   0 0 0  0 3 0  0 0 0  0 0 1                        +
++    <----- A ----->  <-B->  <-C->   <-D->  <-E->  <-F->  <-G->                        +
++                                                                                      +
++  The letters below each section of the line are not part of the data, but are added  +
++  here to help the user refer to the notes and definitions above.                     +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++                                                                                      +
++  5. FINAL INSTRUCTIONS                                                               +
++  =====================                                                               +
++                                                                                      +
++  Do NOT alter the lines that end these notes, up to & including the row of           +
+"+  '####', except for the name of the required model. Enter the name after the "":"".    +"
++  The data for the problem(s) to be solved must begin after the line of '###'.        +
++  Enter as many problems (one per line) as needed. The program will continue running  +
++  until the end of file is reached (or an error occurs). Error messages can be found  +
++  in the eaim.rs1 file, so if processing stops unexpectedly, look in eaim.rs1         +
++  first.                                                                              +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++                                                                                      
+Enter model name (Model I, Model II, Model III, or Model IV): Model II                  
+++                                                                                      
+########################################################################################  
+ 
